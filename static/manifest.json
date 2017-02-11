@@ -1,0 +1,8 @@
+{
+    "short_name": "RaspiCar UI",
+    "name": "RaspiCar UI",
+
+
+    "display":      "standalone", /* Could be "fullscreen", "standalone", "minimal-ui", or "browser" */
+    "orientation":  "landscape" /* Could be "landscape" or "portrait" */
+}

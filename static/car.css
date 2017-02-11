@@ -1,0 +1,38 @@
+html,body{
+   background-color: black;
+    margin:0;
+    height:100%;
+    overflow:hidden;
+}
+#webcam {
+    position:absolute;
+    max-width: 100%;
+    max-height: 100vh;
+    height: auto;
+    margin:0 auto;
+    display: block;
+}
+
+#slider-speed  {
+    position:fixed;
+   right:10%;
+   height: 50%;
+   top:25%;
+}
+
+#slider-direction {
+    position:fixed;
+   width: 50%;
+   left:25%;
+   bottom:10%;
+}
+
+.ui-widget-content, .ui-widget-header {
+   background-color:black !important;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default {
+   background: #00f600;
+   border-radius: 50px;
+}
+

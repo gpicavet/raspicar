@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RaspiCar Controller</title>
+    <link rel="manifest" href="static/manifest.json">
+    <link rel="stylesheet" type="text/css" href="static/jquery-ui.min.css"></link>
+    <link rel="stylesheet" type="text/css" href="static/car.css"></link>
+    <script src="static/jquery-3.1.1.min.js"></script>
+    <script src="static/jquery-ui.min.js"></script>
+    <script src="static/jquery.ui.touch-punch.min.js"></script>
+
+    <script>
+        $(function() {
+            curKeyMap = {};
+
+            $("#slider-speed").slider({
+                orientation: "vertical",
+                range: "min",
+                min: -35,
+                max: 35,
+                value: 0,
+                slide: function(event, ui) {
+                    console.log(ui.value);
+                }
+            });
+
+            $("#slider-direction").slider({
+                orientation: "horizontal",
+                range: "min",
+                min: -100,
+                max: 100,
+                value: 0,
+                slide: function(event, ui) {
+                    console.log(ui.value);
+                }
+            });
+
+            $(document).ready(function() {
+                console.log("ready");
+                motionJpeg("#webcam");
+                document.onkeydown = checkKey;
+                document.onkeyup = checkKeyUp;
+            });
+
+            function send(com, opts) {
+                opts = opts || {};
+                fetch("/c/" + com + "?" + $.param(opts));
+            }
+
+            function checkKey(e) {
+
+                e = e || window.event;
+
+                if (e.keyCode == '38' && !curKeyMap[e.keyCode]) {
+                    // up arrow
+                    send('F', {p1: 35});
+                    $("#slider-speed").slider("value", 35);
+                } else if (e.keyCode == '40' && !curKeyMap[e.keyCode]) {
+                    // down arrow
+                    send('B', {
+                        p1: 35
+                    });
+                    $("#slider-speed").slider("value", -35);
+                } else if (e.keyCode == '37' && !curKeyMap[e.keyCode]) {
+                    // left arrow
+                    send('L', {
+                        p1: 0
+                    });
+                    $("#slider-direction").slider("value", -100);
+                } else if (e.keyCode == '39' && !curKeyMap[e.keyCode]) {
+                    // right arrow
+                    send('R', {
+                        p1: 0
+                    });
+                    $("#slider-direction").slider("value", 100);
+                }
+                curKeyMap[e.keyCode] = true;
+            }
+
+            function checkKeyUp(e) {
+                if (e.keyCode == '38' || e.keyCode == '40') {
+                    send('H');
+                    $("#slider-speed").slider("value", 0);
+                } else {
+                    send('S');
+                    $("#slider-direction").slider("value", 0);
+                }
+                curKeyMap[e.keyCode] = false;
+            }
+
+
+            function motionJpeg(id) {
+                var image = $(id);
+
+                image.on("load", function() {
+                    motionJpegSet(this);
+                });
+
+                motionJpegSet(image);
+            }
+
+            function motionJpegSet(img) {
+                img.src = "{{ mjpeg_serv_url }}&n=" + Date.now();
+            }
+
+        });
+    </script>
+</head>
+
+<body>
+
+    <img id="webcam" src="{{ mjpeg_serv_url }}"></img>
+    <div id="slider-speed" />
+    <div id="slider-direction" />
+
+
+</body>
+
+</html>
