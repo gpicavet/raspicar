@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>RaspiCar Controller</title>
+    <title>LegoCar Controller</title>
     <link rel="manifest" href="static/manifest.json">
     <link rel="stylesheet" type="text/css" href="static/jquery-ui.min.css"></link>
     <link rel="stylesheet" type="text/css" href="static/car.css"></link>
@@ -12,9 +12,12 @@
     <script src="static/jquery-ui.min.js"></script>
     <script src="static/jquery.ui.touch-punch.min.js"></script>
 
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+
     <script>
         $(function() {
-            curKeyMap = {};
+            var socket=null;
+            var curKeyMap = {};
 
             $("#slider-speed").slider({
                 orientation: "vertical",
@@ -39,15 +42,18 @@
             });
 
             $(document).ready(function() {
-                console.log("ready");
+                socket = io.connect('http://' + document.domain + ':' + location.port);
+                socket.on('connect', function() {
+                    socket.emit('is_connected', {data: 'I\'m connected!'});
+                });
+
                 motionJpeg("#webcam");
                 document.onkeydown = checkKey;
                 document.onkeyup = checkKeyUp;
             });
 
             function send(com, opts) {
-                opts = opts || {};
-                fetch("/c/" + com + "?" + $.param(opts));
+                socket.emit('command', {command: com, opts: opts || {}});
             }
 
             function checkKey(e) {
@@ -111,8 +117,9 @@
 </head>
 
 <body>
-
-    <img id="webcam" src="{{ mjpeg_serv_url }}"></img>
+    <div id="webcamcont">
+       <img id="webcam" src="{{ mjpeg_serv_url }}"></img>
+    </div>
     <div id="slider-speed" />
     <div id="slider-direction" />
 
