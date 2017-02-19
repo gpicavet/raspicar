@@ -8,7 +8,7 @@
     <link rel="manifest" href="static/manifest.json">
     <link rel="stylesheet" type="text/css" href="static/lib/jquery-ui.min.css"></link>
     <link rel="stylesheet" type="text/css" href="static/car.css"></link>
-    <script src="static/lib/jquery-3.1.1.min.js"></script>
+    <script src="static/lib/jquery.min.js"></script>
     <script src="static/lib/jquery-ui.min.js"></script>
     <script src="static/lib/jquery.ui.touch-punch.min.js"></script>
     <script src="static/lib/socket.io.min.js"></script>
@@ -17,13 +17,6 @@
         $(function() {
             var socket=null;
             var curKeyMap = {};
-
-            $("#webcamstart").button()
-              .click(function() {
-                fetch("/mjpeg?start=1").then(function() {
-                  motionJpeg();
-                });
-              });
 
             $("#slider-speed").slider({
                 orientation: "vertical",
@@ -102,13 +95,12 @@
                 var image = $(id);
 
                 image.on("load", function() {
-                    $("#webcamstart").button().hide()
                     motionJpegSet(this);
                 });
 
                 image.on("error", function(e) {
                   console.error("error loading image",e);
-                  $("#webcamstart").button().show()
+                  $("#webcamerror").show()
                 });
 
                 motionJpegSet(image);
@@ -124,7 +116,7 @@
 
 <body>
     <div id="webcamcont">
-       <button id="webcamstart">Start Video</button>
+       <span id="webcamerror" style="display:none">error connecting to mjpeg server</span>
        <img id="webcam" src="{{ mjpeg_serv_url }}"></img>
     </div>
     <div id="slider-speed" />

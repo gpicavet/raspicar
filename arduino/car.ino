@@ -1,7 +1,15 @@
 #include <AccelStepper.h>
 
-AccelStepper stepper1(AccelStepper::FULL2WIRE, 3, 2);
+AccelStepper stepper1(AccelStepper::FULL2WIRE, 5, 4);
 AccelStepper stepper2(AccelStepper::FULL2WIRE, 9, 8);
+
+const int PIN_SONAR = A0;
+const int READS_SONAR=10;
+const int SONAR_READ_PERIOD_MS=20;
+
+unsigned long lastSonarReadTime=0;
+int nbReadsSonar=0;
+int sonarValue=0;
 
 bool stepper1Stop=true;
 bool stepper2Moving=false;
@@ -9,7 +17,9 @@ bool stepper2Moving=false;
 void setup()
 {  
     Serial.begin(9600);
-
+  
+    pinMode(PIN_SONAR, INPUT);
+  
     stepper1.setEnablePin(12);
     stepper2.setEnablePin(13);
     
@@ -85,5 +95,17 @@ void loop()
 
     stepper1.run();
     stepper2.run();
+    
+    if(millis() - lastSonarReadTime >= SONAR_READ_PERIOD_MS) {
+      sonarValue += analogRead(PIN_SONAR)/2;
+      nbReadsSonar ++;
+      lastSonarReadTime = millis();
+
+      if(nbReadsSonar >= READS_SONAR) {
+        Serial.println(sonarValue * 2.54 / READS_SONAR);
+        sonarValue=0;
+        nbReadsSonar=0;
+      }
+    }
 
 }
